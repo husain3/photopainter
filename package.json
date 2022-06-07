@@ -5,7 +5,7 @@
   "scripts": {
     "eslint": "eslint .",
     "build:opencv": "docker run --rm -t -w /src -v \"$PWD\"/../opencv:/src/opencv emscripten/emsdk sh -c 'EMSCRIPTEN=/emsdk/upstream/emscripten python3 opencv/platforms/js/build_js.py opencv/build_wasm --build_wasm'",
-    "build:wasm": "docker run --rm -t -w /src -v \"$PWD\"/../opencv:/src/opencv -v \"$PWD\":/src/emscripten-opencv emscripten/emsdk sh emscripten-opencv/build-wasm.sh",
+    "build:wasm": "docker run --rm -t -w /src -v \"$PWD\"/../opencv:/src/opencv -v \"$PWD\":/src/photopainter emscripten/emsdk sh photopainter/build-wasm.sh",
     "build": "npm run build:wasm && webpack",
     "start": "node server",
     "start:dev": "npm run build:wasm && webpack-dev-server",
