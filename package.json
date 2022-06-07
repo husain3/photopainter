@@ -8,7 +8,7 @@
     "build:wasm": "docker run --rm -t -w /src -v \"$PWD\"/../opencv:/src/opencv -v \"$PWD\":/src/photopainter emscripten/emsdk sh photopainter/build-wasm.sh",
     "build": "npm run build:wasm && webpack",
     "start": "node server",
-    "start:dev": "npm run build:wasm && webpack-dev-server",
+    "start:dev": "npm run build:wasm && webpack serve",
     "heroku-postbuild": "echo use contents of dist folder",
     "test": "mocha --experimental-wasm-threads --no-warnings"
   },

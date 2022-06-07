@@ -19,6 +19,7 @@ module.exports = {
       patterns: [
         { context: './src', from: '*.css' },
         { context: './src', from: 'images/*.png' },
+        { context: './src', from: 'images/*.jpg' },
         { context: './build', from: 'hello.js' },
         { context: './build', from: 'hello.wasm' },
         { context: './test', from: 'tests.html' },
@@ -33,6 +34,7 @@ module.exports = {
   ],
   devtool: 'source-map',
   devServer: {
-    contentBase: DIST_FOLDER
+    contentBase: DIST_FOLDER,
+    port: 8082
   }
 }

@@ -38,4 +38,4 @@ file(GLOB opencv_lib_core "${OPENCV_DIR}/build_wasm/lib/libopencv_core.a")
 target_link_libraries(hello ${opencv_lib_core})
 
 # Specify linker arguments
-set_target_properties(hello PROPERTIES LINK_FLAGS "-s EXPORTED_RUNTIME_METHODS=cwrap -s EXPORTED_FUNCTIONS=_free -s MODULARIZE=1 -s EXPORT_NAME=createHelloModule")
+set_target_properties(hello PROPERTIES LINK_FLAGS "-s EXPORTED_RUNTIME_METHODS=cwrap -s EXPORTED_FUNCTIONS=_free -sASSERTIONS=1 --memoryprofiler -s TOTAL_MEMORY=1024MB -sALLOW_MEMORY_GROWTH=1 -fsanitize=address --source-map-base http://localhost:8000/hello.wasm -s MODULARIZE=1 -s EXPORT_NAME=createHelloModule")

@@ -32,6 +32,8 @@ const imageDataFrom1Channel = (data, width, height) => {
 const imageDataFrom4Channels = (data, width, height) => {
   console.log('[imageDataFrom4Channels]')
   const array = new Uint8ClampedArray(data)
+  console.log("IMAGE DATA 4")
+  console.log(array)
   const imageData = new ImageData(array, width, height)
   return imageData
 }
@@ -121,6 +123,8 @@ const loadInputImage = async index => {
 }
 
 const unpackImage = (module, [width, height, channels, addr]) => {
+  console.log('[unpackImage]')
+  console.log(height)
   const cb = width * height * channels
   const data = module.HEAPU8.slice(addr, addr + cb)
   return channels === 1
@@ -128,12 +132,49 @@ const unpackImage = (module, [width, height, channels, addr]) => {
     : imageDataFrom4Channels(data, width, height)
 }
 
+const unpackProcessImageResult1 = (module, addr) => {
+  const NUM_INT_FIELDS = 4
+  const addr32 = addr / module.HEAP32.BYTES_PER_ELEMENT
+  const data32 = module.HEAP32.slice(addr32, addr32 + NUM_INT_FIELDS)
+  // const boundingBox = data32.slice(0, 4)
+  const image1 = unpackImage(module, data32.slice(0, 4))
+  // const image2 = unpackImage(module, data32.slice(8, 12))
+  // const corners = unpackCorners(data32.slice(12, 20))
+  // const contour = unpackContour(module, data32.slice(20, 22))
+  return { image1 }
+}
+
+const onConvertImage = (module, convertImage) => () => {
+  console.log('[onConvertImage]')
+  reset()
+  const { data, width, height } = getImageData()
+  const array = new Uint8ClampedArray(data)
+  console.log(array)
+  const startTime = performance.now()
+  const addr = convertImage(data, width, height)
+  const endTime = performance.now()
+  console.log(addr)
+  const unpackedResult = unpackProcessImageResult1(module, addr)
+  drawOutputImage(unpackedResult.image1, 'output-image-1')
+  module._free(addr)
+}
+
+const wrapConvertImage = module => {
+  console.log('[wrapConvertImage]')
+  const ident = 'convertImage'
+  const returnType = 'number'
+  const argTypes = ['array', 'number', 'number']
+  const convertImage = module.cwrap(ident, returnType, argTypes)
+  return convertImage
+}
+
 const init = module => {
   console.log('[init]')
   const inputImageSelector = document.getElementById('input-image-selector')
   range(2).forEach(index => {
     const sudokuNumber = index + 1
-    const value = `/images/sudoku-${sudokuNumber}.png`
+    // const value = `/images/sudoku-${sudokuNumber}.png`
+    const value = `/images/meme.png`
     const label = `Sudoku ${sudokuNumber}`
     const optionElement = document.createElement('option')
     optionElement.setAttribute('value', value)
@@ -141,6 +182,10 @@ const init = module => {
     inputImageSelector.appendChild(optionElement)
   })
   loadInputImage(0)
+  const convertImage = wrapConvertImage(module)
+  console.log(convertImage)
+  const convertImageBtn = document.getElementById('convert-image-btn')
+  convertImageBtn.addEventListener('click', onConvertImage(module, convertImage))
 }
 
 const main = async () => {
