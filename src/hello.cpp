@@ -79,28 +79,17 @@ int *convertImage(uchar *array, int width, int height) {
   std::cout << "INSIDE convertImage" << std::endl;
   Mat matNormalised(height, width, CV_8UC4, array);
 
-  // cvtColor(matNormalised, matNormalised, COLOR_RGBA2GRAY);
-  // cv::xphoto::oilPainting(matNormalised, matNormalised, 10, 1, COLOR_BGR2Lab);
   std::cout << "Original Image"<< std::endl;
   std::cout << matNormalised.cols * matNormalised.rows * matNormalised.channels() << std::endl;
   Mat stylized;
-  try {
-    cv::stylization(matNormalised, stylized);
-    std::cout << "changed " << matNormalised.cols << " " << matNormalised.rows << " " << " " << matNormalised.channels() << std::endl;
-  } 
-  catch(exception& e) {
-    std::cout << "Stylization exception " << e.what() << std::endl;
-  }
 
-  stylized.convertTo(stylized,CV_8UC4,255);
+  cvtColor(matNormalised, matNormalised, COLOR_BGRA2BGR);
+  stylization(matNormalised, stylized);
   cvtColor(stylized, stylized, COLOR_BGR2BGRA);
-  Mat changed(stylized.size(), CV_MAKE_TYPE(stylized.depth(), 4));
-  int from_to[] = { 0,0, 1,1, 2,2, 2,3 };
-  cv::mixChannels(&stylized,1,&changed,1,from_to,4);
 
-  int return_image_1_width = changed.cols;
-  int return_image_1_height = changed.rows;
-  int return_image_1_channels = changed.channels();
+  int return_image_1_width = stylized.cols;
+  int return_image_1_height = stylized.rows;
+  int return_image_1_channels = stylized.channels();
   int return_image_1_size = return_image_1_width * return_image_1_height * return_image_1_channels;
 
   std::cout << "New Image"<< std::endl;
@@ -110,7 +99,7 @@ int *convertImage(uchar *array, int width, int height) {
   int *return_data = static_cast<int*>(malloc(return_data_size));
 
   uchar *return_image_1_addr = reinterpret_cast<uchar*>(&return_data[4]);
-  memcpy(return_image_1_addr, changed.data, return_image_1_size);
+  memcpy(return_image_1_addr, stylized.data, return_image_1_size);
 
   return_data[0] = return_image_1_width;
   return_data[1] = return_image_1_height;
